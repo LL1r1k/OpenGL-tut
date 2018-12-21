@@ -26,7 +26,7 @@ void main()
 
 	//Specular light
 	vec3 lightToPosDirVec = normalize(lightPos0 - vs_position);
-	vec3 reflectDirVec = normalize(reflect(lightToPosDirVec, vs_normal));
+	vec3 reflectDirVec = normalize(reflect(lightToPosDirVec, normalize(vs_normal)));
 	vec3 posToViewDirVec = normalize(vs_position - cameraPos);
 	float specularConstant = pow(max(dot(posToViewDirVec, reflectDirVec), 0), 30);
 	vec3 specularFinal = vec3(1.f,1.f,1.f) * specularConstant;
