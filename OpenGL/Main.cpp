@@ -16,8 +16,40 @@ GLuint indices[]=
 };
 unsigned nrOfIndices = sizeof(indices) / sizeof(GLuint);
 
-void updateInput(GLFWwindow* window)
+
+void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale)
 {
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+	{
+		position.z -= 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+	{
+		position.z += 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+	{
+		position.x -= 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+	{
+		position.x += 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
+	{
+		rotation.y -= 2.0f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
+	{
+		rotation.y += 2.0f;
+	}if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+	{
+		scale -= 0.01f;
+	}
+	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
+	{
+		scale += 0.01f;
+	}
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
 		glfwSetWindowShouldClose(window, GL_TRUE);
@@ -260,10 +292,16 @@ int main(int args, char** argv)
 	SOIL_free_image_data(image1);
 
 	//ModelMatrix
+	glm::vec3 position(0.f);
+	glm::vec3 roatation(0.f);
+	glm::vec3 scale(1.f);
+
 	glm::mat4 ModelMatrix(1.f);
-	ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f, 0.f, 0.f)); // add 
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(0.f), glm::vec3(1.f, 0.f, 0.f)); //x axis
-	ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f)); 
+	ModelMatrix = glm::translate(ModelMatrix, position); // add 
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roatation.x), glm::vec3(1.f, 0.f, 0.f)); //x axis
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roatation.y), glm::vec3(0.f, 1.f, 0.f)); //y axis
+	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roatation.z), glm::vec3(0.f, 0.f, 1.f)); //z axis
+	ModelMatrix = glm::scale(ModelMatrix, scale); 
 	
 	//Camera 
 	glm::vec3 camPosition(0.f, 0.f, 1.0f);
@@ -293,7 +331,7 @@ int main(int args, char** argv)
 		//UPDATE INPUT
 		glfwPollEvents();
 		//UPDATE
-		updateInput(window);
+		updateInput(window,position, roatation, scale);
 
 		//DRAW
 			//CLEAR
@@ -308,9 +346,13 @@ int main(int args, char** argv)
 		glUniform1i(glGetUniformLocation(core_program, "texture1"), 1);
 
 		//Move, rotate and scale 
-		ModelMatrix = glm::translate(ModelMatrix, glm::vec3(0.f, 0.f, 0.f)); // add 
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(2.f), glm::vec3(0.f, 1.f, 0.f)); //x axis
-		ModelMatrix = glm::scale(ModelMatrix, glm::vec3(1.f));
+
+		ModelMatrix = glm::mat4(1.f);
+		ModelMatrix = glm::translate(ModelMatrix, position); // add 
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roatation.x), glm::vec3(1.f, 0.f, 0.f)); //x axis
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roatation.y), glm::vec3(0.f, 1.f, 0.f)); //y axis
+		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roatation.z), glm::vec3(0.f, 0.f, 1.f)); //z axis
+		ModelMatrix = glm::scale(ModelMatrix, scale);
 
 		glUniformMatrix4fv(glGetUniformLocation(core_program, "ModelMatrix"), 1, GL_FALSE, glm::value_ptr(ModelMatrix));
 
