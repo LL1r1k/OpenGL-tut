@@ -5,7 +5,7 @@ Vertex vertices[] = {
 	glm::vec3(-0.5f, 0.5f, 0.f),	glm::vec3(1.f, 0.f, 0.f),	glm::vec2(0.f, 1.f),
 	glm::vec3(-0.5f, -0.5f, 0.f),	glm::vec3(0.f, 1.f, 0.f),	glm::vec2(0.f, 0.f),
 	glm::vec3(0.5f, -0.5f, 0.f),	glm::vec3(0.f, 0.f, 1.f),	glm::vec2(1.f, 0.f),
-	glm::vec3(0.5f, 0.5f, 0.f),		glm::vec3(1.f, 1.f, 0.f),	glm::vec2(0.f, 0.f)	
+	glm::vec3(0.5f, 0.5f, 0.f),		glm::vec3(1.f, 1.f, 0.f),	glm::vec2(1.f, 1.f)	
 };
 unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
 
@@ -165,7 +165,7 @@ int main(int args, char** argv)
 	glFrontFace(GL_CCW); //front face - counter clock wise
 
 	glEnable(GL_BLEND);
-	glBlendFunc(GL_SRC_ALPHA, GL_BLEND_SRC_ALPHA);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL /*GL_LINE*/); //how to draw polygon fill or just line
 
@@ -204,6 +204,33 @@ int main(int args, char** argv)
 
 	glBindVertexArray(0);
 
+	//TEXUTE INIT
+	int image_width = 0, image_height = 0;
+	unsigned char* image = SOIL_load_image("Images/mario.png", &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
+
+	GLuint texture0;
+	glGenTextures(1, &texture0);
+	glBindTexture(GL_TEXTURE_2D, texture0);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+
+	if (image)
+	{
+		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
+		glGenerateMipmap(GL_TEXTURE_2D);
+	}
+	else
+	{
+		std::cout << "ERROR:TEXTURE_LOADING_FAILED" << std::endl;
+	}
+
+	glActiveTexture(0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+	SOIL_free_image_data(image);
+
 	//--MAIN LOOP
 	while (!glfwWindowShouldClose(window))
 	{
@@ -220,6 +247,12 @@ int main(int args, char** argv)
 			//Use a program
 		glUseProgram(core_program);
 		
+			//Update uniform
+		glUniform1i(glGetUniformLocation(core_program, "texture0"), 0);
+
+			//Activate texture
+		glActiveTexture(GL_TEXTURE0);
+		glBindTexture(GL_TEXTURE_2D, texture0);
 			//Bind vertex array object
 		glBindVertexArray(VAO);
 			
@@ -231,6 +264,10 @@ int main(int args, char** argv)
 			//END DRAW
 		glfwSwapBuffers(window);
 		glFlush();
+		glBindVertexArray(0);
+		glUseProgram(0);
+		glActiveTexture(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	//--END OF PROGRAM
 	glfwDestroyWindow(window);
