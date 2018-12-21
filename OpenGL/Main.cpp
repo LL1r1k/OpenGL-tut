@@ -57,7 +57,6 @@ int main(int args, char** argv)
 		glfwSwapBuffers(window);
 		glFlush();
 	}
-
 	//--END OF PROGRAM
 	glfwTerminate();
 
