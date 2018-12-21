@@ -1,5 +1,13 @@
 #include "lib.h"
 
+void updateInput(GLFWwindow* window)
+{
+	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+	{
+		glfwSetWindowShouldClose(window, GL_TRUE);
+	}
+}
+
 void framebuffer_resize_callback(GLFWwindow* window, int fbW, int fbH) 
 {
 	glViewport(0, 0, fbW, fbH);
@@ -121,6 +129,7 @@ int main(int args, char** argv)
 	glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback); //For Resizable window
 	//glfwGetFramebufferSize(window, &framebufferWidht, &framebufferHeight); // Fow nonResizablw window
 	//glViewport(0, 0, framebufferWidht, framebufferHeight); //Canvas size // Fow nonResizablw window
+
 	glfwMakeContextCurrent(window);
 
 	//--INIT GLEW (NEEDS WINDOW AND OPENGL CONTEXT)
@@ -131,6 +140,18 @@ int main(int args, char** argv)
 		std::cout << "ERROR::MAIN.cpp::GLEW_INIT_FAILED" << std::endl;
 		glfwTerminate();
 	}
+
+	//OPENGL OPTIONS
+	glEnable(GL_DEPTH_TEST); // z-coordinate
+
+	glEnable(GL_CULL_FACE); // don't show back face
+	glCullFace(GL_BACK); // don't show BACK face
+	glFrontFace(GL_CCW); //front face - counter clock wise
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_BLEND_SRC_ALPHA);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL /*GL_LINE*/); //how to draw polygon fill or just line
 
 	//SHADER INIT
 	GLuint core_program;
@@ -143,6 +164,7 @@ int main(int args, char** argv)
 		//UPDATE INPUT
 		glfwPollEvents();
 		//UPDATE
+		updateInput(window);
 
 		//DRAW
 			//CLEAR
