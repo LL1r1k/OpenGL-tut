@@ -1,6 +1,9 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
+#include <string>
+#include <vector>
 
 #include <glew.h> //graphics
 #include <glfw3.h> //window
@@ -13,4 +16,4 @@
 #include <mat4x4.hpp>
 #include <gtc\type_ptr.hpp>
 
-#include <SOIL2.h>
+#include <SOIL2.h> //load image
