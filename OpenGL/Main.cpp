@@ -1,5 +1,18 @@
 #include "lib.h"
 
+Vertex vertices[] = {
+	glm::vec3(0.0f, 0.5f, 0.f), glm::vec3(1.f, 0.f, 0.f), glm::vec2(0.f, 1.f),
+	glm::vec3(-0.5f, -0.5f, 0.f), glm::vec3(0.f, 1.f, 0.f), glm::vec2(0.f, 0.f),
+	glm::vec3(0.5f, -0.5f, 0.f), glm::vec3(0.f, 0.f, 1.f), glm::vec2(1.f, 0.f)
+};
+unsigned nrOfVertices = sizeof(vertices) / sizeof(Vertex);
+
+GLuint indices[]=
+{
+	0, 1, 2
+};
+unsigned nrOfIndices = sizeof(indices) / sizeof(GLuint);
+
 void updateInput(GLFWwindow* window)
 {
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -158,6 +171,36 @@ int main(int args, char** argv)
 	if (!loadShaders(core_program))
 		glfwTerminate();
 
+	//VAO
+	GLuint VAO;
+	glCreateVertexArrays(1, &VAO);
+	glBindVertexArray(VAO);
+
+	//VBO 
+	GLuint VBO;
+	glGenBuffers(1, &VBO);
+	glBindBuffer(GL_ARRAY_BUFFER, VBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW/*GL_DYNAMIC_DRAW*/); // dynamic if u want to change vertices
+
+	//EBO
+	GLuint EBO;
+	glGenBuffers(1, &EBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
+
+	//SET VERTEXATTRIBPOINTERS AND ENABLE (INPUT ASSEMBLY)
+	//Postition
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
+	glEnableVertexAttribArray(0);
+	//Color
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
+	glEnableVertexAttribArray(1);
+	//Texcoord
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
+	glEnableVertexAttribArray(2);
+
+	glBindVertexArray(0);
+
 	//--MAIN LOOP
 	while (!glfwWindowShouldClose(window))
 	{
@@ -171,7 +214,16 @@ int main(int args, char** argv)
 		glClearColor(0.f, 0.f, 0.f, 1.f); //RGBA
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //What u need to clear
 
+			//Use a program
+		glUseProgram(core_program);
+		
+			//Bind vertex array object
+		glBindVertexArray(VAO);
+			
 			//DRAW
+		//glDrawArrays(GL_TRIANGLES, 0, nrOfVertices);
+		glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
+
 
 			//END DRAW
 		glfwSwapBuffers(window);
