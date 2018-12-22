@@ -17,38 +17,39 @@ GLuint indices[]=
 unsigned nrOfIndices = sizeof(indices) / sizeof(GLuint);
 
 
-void updateInput(GLFWwindow* window, glm::vec3& position, glm::vec3& rotation, glm::vec3& scale)
+void updateInput(GLFWwindow* window, Mesh &mesh)
 {
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
 	{
-		position.z -= 0.01f;
+		mesh.Move(glm::vec3(0.f, 0.f, -0.01f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
 	{
-		position.z += 0.01f;
+		mesh.Move(glm::vec3(0.f, 0.f, 0.01f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
 	{
-		position.x -= 0.01f;
+		mesh.Move(glm::vec3(-0.01f, 0.f, 0.f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
 	{
-		position.x += 0.01f;
+		mesh.Move(glm::vec3(0.01f, 0.f, 0.f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
 	{
-		rotation.y -= 2.0f;
+		mesh.Rotate(glm::vec3(0.f, -2.f, 0.f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
 	{
-		rotation.y += 2.0f;
-	}if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
+		mesh.Rotate(glm::vec3(0.f, 2.f, 0.f));
+	}
+	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
 	{
-		scale -= 0.01f;
+		mesh.Scale(glm::vec3(-0.01f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
 	{
-		scale += 0.01f;
+		mesh.Scale(glm::vec3(0.01f));
 	}
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 	{
@@ -152,7 +153,7 @@ int main(int args, char** argv)
 		//UPDATE INPUT
 		glfwPollEvents();
 		//UPDATE
-		//updateInput(window,position, roatation, scale);
+		updateInput(window, test);
 
 		//DRAW
 			//CLEAR
@@ -163,6 +164,7 @@ int main(int args, char** argv)
 		core_program.set1i(texture0.getTextureUint(), "texture0");
 		material0.sendToShader(core_program);
 
+			//Update framebuffer size and projection matrix
 		glfwGetFramebufferSize(window, &framebufferWidht, &framebufferHeight);
 		ProjectionMatrix = glm::mat4(1.f);
 		ProjectionMatrix = glm::perspective(glm::radians(fov), static_cast<float>(framebufferWidht / framebufferHeight), nearPlane, farPlane);
@@ -173,12 +175,14 @@ int main(int args, char** argv)
 
 			//Activate texture
 		texture0.bind();
-			//Render test mesh
+
+			//Render mesh
 		test.render(&core_program);
 
 			//END DRAW
 		glfwSwapBuffers(window);
 		glFlush();
+
 		glBindVertexArray(0);
 		glUseProgram(0);
 		texture0.unbind();
