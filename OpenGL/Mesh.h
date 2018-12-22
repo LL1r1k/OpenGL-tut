@@ -4,6 +4,7 @@
 #include <vector>
 
 #include "Vertex.h"
+#include "Primitives.h"
 #include "Shader.h"
 #include "Texture.h"
 #include "Material.h"
@@ -13,6 +14,8 @@ class Mesh
 {
 public:
 	Mesh(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices,
+		glm::vec3& position = glm::vec3(0.f), glm::vec3& rotation = glm::vec3(0.f), glm::vec3& scale = glm::vec3(1.f));
+	Mesh(Primitives* primitive,
 		glm::vec3& position = glm::vec3(0.f), glm::vec3& rotation = glm::vec3(0.f), glm::vec3& scale = glm::vec3(1.f));
 	~Mesh();
 	void update();
@@ -40,6 +43,7 @@ private:
 	GLuint EBO;
 
 	void initVAO(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices);
+	void initVAO(Primitives* primitive);
 	void updateUniforms(Shader* shader);
 
 };
