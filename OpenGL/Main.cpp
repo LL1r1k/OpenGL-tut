@@ -45,31 +45,33 @@ void framebuffer_resize_callback(GLFWwindow* window, int fbW, int fbH)
 	glViewport(0, 0, fbW, fbH);
 }
 
+GLFWwindow* createWindow(const char* title, int& fbwidth, int& fbheight,
+	const int width = 640, const int height = 640,  
+	bool resizable = true, int GLmajorVer = 4, int GLminorVer = 5)
+{
+	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, GLmajorVer);
+	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, GLminorVer);
+	glfwWindowHint(GLFW_RESIZABLE, resizable);
+
+	GLFWwindow* window = glfwCreateWindow(width, height, title, NULL, NULL);
+
+	glfwGetFramebufferSize(window, &fbwidth, &fbheight); 
+	glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback); 
+
+	glfwMakeContextCurrent(window);	
+	return window;
+}
+
 int main(int args, char** argv)
 {
 	//--INIT GLFW
 	glfwInit();
 
-	//--CREATE WINDOW
-	const int WINDOW_WIDHT = 640;
-	const int WINDOW_HEIGHT = 640;
 	int framebufferWidht = 0;
 	int framebufferHeight = 0;
 
-	glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 4); //OpenGL 4
-	glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5); //.5
-	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-
-	//glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE); //Mac OS
-
-	GLFWwindow* window = glfwCreateWindow(WINDOW_WIDHT, WINDOW_HEIGHT, "Title", /*Fullscreen arg*/NULL, NULL);
-
-	glfwGetFramebufferSize(window, &framebufferWidht, &framebufferHeight); // Fow nonResizablw window
-	glfwSetFramebufferSizeCallback(window, framebuffer_resize_callback); //For Resizable window
-	//glViewport(0, 0, framebufferWidht, framebufferHeight); //Canvas size // Fow nonResizablw window
-
-	glfwMakeContextCurrent(window);
+	GLFWwindow* window = createWindow("OpenGL tut", framebufferWidht, framebufferHeight);
 
 	//--INIT GLEW (NEEDS WINDOW AND OPENGL CONTEXT)
 	glewExperimental = GL_TRUE;
