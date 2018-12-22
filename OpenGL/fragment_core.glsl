@@ -8,7 +8,6 @@ in vec3 vs_normal;
 out vec4 fs_color;
 
 uniform sampler2D texture0;
-uniform sampler2D texture1;
 
 uniform vec3 lightPos0;
 uniform vec3 cameraPos;

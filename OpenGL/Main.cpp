@@ -145,59 +145,8 @@ int main(int args, char** argv)
 	glBindVertexArray(0);
 
 	//TEXUTE INIT
-	//Texture 0
-	int image_width = 0, image_height = 0;
-	unsigned char* image = SOIL_load_image("Images/mario.png", &image_width, &image_height, NULL, SOIL_LOAD_RGBA);
-
-	GLuint texture0;
-	glGenTextures(1, &texture0);
-	glBindTexture(GL_TEXTURE_2D, texture0);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	if (image)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width, image_height, 0, GL_RGBA, GL_UNSIGNED_BYTE, image);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "ERROR:TEXTURE_LOADING_FAILED" << std::endl;
-	}
-
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	SOIL_free_image_data(image);
-
-	//Texture 1
-	int image_width1 = 0, image_height1 = 0;
-	unsigned char* image1 = SOIL_load_image("Images/pusheen.png", &image_width1, &image_height1, NULL, SOIL_LOAD_RGBA);
-
-	GLuint texture1;
-	glGenTextures(1, &texture1);
-	glBindTexture(GL_TEXTURE_2D, texture1);
-
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-
-	if (image1)
-	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image_width1, image_height1, 0, GL_RGBA, GL_UNSIGNED_BYTE, image1);
-		glGenerateMipmap(GL_TEXTURE_2D);
-	}
-	else
-	{
-		std::cout << "ERROR:TEXTURE_LOADING_FAILED" << std::endl;
-	}
-
-	glActiveTexture(0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-	SOIL_free_image_data(image1);
+		//Texture 0
+	Texture texture0("Images/mario.png", GL_TEXTURE_2D);
 
 	//ModelMatrix
 	glm::vec3 position(0.f);
@@ -249,12 +198,9 @@ int main(int args, char** argv)
 			//CLEAR
 		glClearColor(0.f, 0.f, 0.f, 1.f); //RGBA
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT); //What u need to clear
-
-		
 		
 			//Update uniform
-		core_program.set1i(0, "texture0");
-		core_program.set1i(1, "texture1");
+		core_program.set1i(texture0.getTextureUint(), "texture0");
 
 		//Move, rotate and scale 
 
@@ -276,10 +222,8 @@ int main(int args, char** argv)
 		core_program.use();
 
 			//Activate texture
-		glActiveTexture(GL_TEXTURE0);
-		glBindTexture(GL_TEXTURE_2D, texture0);
-		glActiveTexture(GL_TEXTURE1);
-		glBindTexture(GL_TEXTURE_2D, texture1);
+		texture0.bind();
+
 			//Bind vertex array object
 		glBindVertexArray(VAO);
 			
@@ -293,8 +237,7 @@ int main(int args, char** argv)
 		glFlush();
 		glBindVertexArray(0);
 		glUseProgram(0);
-		glActiveTexture(0);
-		glBindTexture(GL_TEXTURE_2D, 0);
+		texture0.unbind();
 	}
 	//--END OF PROGRAM
 	glfwDestroyWindow(window);
