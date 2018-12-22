@@ -148,6 +148,9 @@ int main(int args, char** argv)
 		//Texture 0
 	Texture texture0("Images/mario.png", GL_TEXTURE_2D);
 
+	//MATERIAL 0
+	Material material0(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f), texture0.getTextureUint());
+	
 	//ModelMatrix
 	glm::vec3 position(0.f);
 	glm::vec3 roatation(0.f);
@@ -201,6 +204,7 @@ int main(int args, char** argv)
 		
 			//Update uniform
 		core_program.set1i(texture0.getTextureUint(), "texture0");
+		material0.sendToShader(core_program);
 
 		//Move, rotate and scale 
 
