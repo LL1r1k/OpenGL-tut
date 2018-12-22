@@ -1,9 +1,7 @@
 #pragma once
 
-#include <iostream>
 #include <fstream>
 #include <string>
-#include <vector>
 
 #include <glew.h> //graphics
 #include <glfw3.h> //window
@@ -18,14 +16,4 @@
 
 #include <SOIL2.h> //load image
 
-#include "Shader.h"
-#include "Texture.h"
-#include "Material.h"
-
-struct Vertex
-{
-	glm::vec3 position;
-	glm::vec3 color;
-	glm::vec2 texcoord;
-	glm::vec3 normal;
-};
+#include "Mesh.h"

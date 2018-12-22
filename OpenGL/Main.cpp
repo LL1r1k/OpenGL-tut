@@ -111,57 +111,15 @@ int main(int args, char** argv)
 	//SHADER INIT	
 	Shader core_program("vertex_core.glsl", "fragment_core.glsl");
 
-	//VAO
-	GLuint VAO;
-	glCreateVertexArrays(1, &VAO);
-	glBindVertexArray(VAO);
-
-	//VBO 
-	GLuint VBO;
-	glGenBuffers(1, &VBO);
-	glBindBuffer(GL_ARRAY_BUFFER, VBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW/*GL_DYNAMIC_DRAW*/); // dynamic if u want to change vertices
-
-	//EBO
-	GLuint EBO;
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), indices, GL_STATIC_DRAW);
-
-	//SET VERTEXATTRIBPOINTERS AND ENABLE (INPUT ASSEMBLY)
-	//Postition
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
-	glEnableVertexAttribArray(0);
-	//Color
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, color));
-	glEnableVertexAttribArray(1);
-	//Texcoord
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, texcoord));
-	glEnableVertexAttribArray(2);
-	//Normal
-	glVertexAttribPointer(3, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-	glEnableVertexAttribArray(3);
-
-	glBindVertexArray(0);
-
+	//MODEL MESH
+	Mesh test(vertices, nrOfVertices, indices, nrOfIndices);
+	
 	//TEXUTE INIT
 		//Texture 0
 	Texture texture0("Images/mario.png", GL_TEXTURE_2D);
 
 	//MATERIAL 0
 	Material material0(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f), texture0.getTextureUint());
-	
-	//ModelMatrix
-	glm::vec3 position(0.f);
-	glm::vec3 roatation(0.f);
-	glm::vec3 scale(1.f);
-
-	glm::mat4 ModelMatrix(1.f);
-	ModelMatrix = glm::translate(ModelMatrix, position); // add 
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roatation.x), glm::vec3(1.f, 0.f, 0.f)); //x axis
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roatation.y), glm::vec3(0.f, 1.f, 0.f)); //y axis
-	ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roatation.z), glm::vec3(0.f, 0.f, 1.f)); //z axis
-	ModelMatrix = glm::scale(ModelMatrix, scale); 
 	
 	//Camera 
 	glm::vec3 camPosition(0.f, 0.f, 1.0f);
@@ -183,7 +141,6 @@ int main(int args, char** argv)
 	glm::vec3 lightPos0(0.f, 0.f, 1.f);
 
 	//Unit Uniformss
-	core_program.setMat4fv(ModelMatrix, "ModelMatrix");
 	core_program.setMat4fv(ViewMatrix, "ViewMatrix");
 	core_program.setMat4fv(ProjectionMatrix, "ProjectionMatrix");
 	core_program.setVec3f(lightPos0, "lightPos0");
@@ -195,7 +152,7 @@ int main(int args, char** argv)
 		//UPDATE INPUT
 		glfwPollEvents();
 		//UPDATE
-		updateInput(window,position, roatation, scale);
+		//updateInput(window,position, roatation, scale);
 
 		//DRAW
 			//CLEAR
@@ -205,17 +162,6 @@ int main(int args, char** argv)
 			//Update uniform
 		core_program.set1i(texture0.getTextureUint(), "texture0");
 		material0.sendToShader(core_program);
-
-		//Move, rotate and scale 
-
-		ModelMatrix = glm::mat4(1.f);
-		ModelMatrix = glm::translate(ModelMatrix, position); // add 
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roatation.x), glm::vec3(1.f, 0.f, 0.f)); //x axis
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roatation.y), glm::vec3(0.f, 1.f, 0.f)); //y axis
-		ModelMatrix = glm::rotate(ModelMatrix, glm::radians(roatation.z), glm::vec3(0.f, 0.f, 1.f)); //z axis
-		ModelMatrix = glm::scale(ModelMatrix, scale);
-
-		core_program.setMat4fv(ModelMatrix, "ModelMatrix");
 
 		glfwGetFramebufferSize(window, &framebufferWidht, &framebufferHeight);
 		ProjectionMatrix = glm::mat4(1.f);
@@ -227,14 +173,8 @@ int main(int args, char** argv)
 
 			//Activate texture
 		texture0.bind();
-
-			//Bind vertex array object
-		glBindVertexArray(VAO);
-			
-			//DRAW
-		//glDrawArrays(GL_TRIANGLES, 0, nrOfVertices);
-		glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
-
+			//Render test mesh
+		test.render(&core_program);
 
 			//END DRAW
 		glfwSwapBuffers(window);
