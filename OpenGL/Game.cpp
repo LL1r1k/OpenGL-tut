@@ -36,7 +36,7 @@ Game::Game(const char * name, const int width, const int height, bool resize, in
 	initShaders();
 	initTextures();
 	initMaterials();
-	initMeshes();
+	initModels();
 	initLights();
 	initUniforms();
 }
@@ -57,10 +57,10 @@ Game::~Game()
 	for (size_t i = 0; i < materials.size(); i++)
 	{
 		delete materials[i];
-	}
-	for (size_t i = 0; i < meshes.size(); i++)
+	}	
+	for (size_t i = 0; i < models.size(); i++)
 	{
-		delete meshes[i];
+		delete models[i];
 	}
 	for (size_t i = 0; i < lights.size(); i++)
 	{
@@ -72,6 +72,9 @@ void Game::update()
 {
 	glfwPollEvents();
 	updateInput();
+
+	models[0]->Rotate(glm::vec3(0.f, 1.f, 0.f));
+	models[1]->Rotate(glm::vec3(0.f, 1.f, 0.f));
 }
 
 void Game::render()
@@ -81,17 +84,10 @@ void Game::render()
 
 	updateUniforms();
 
-	materials[MAT_1]->sendToShader(*shaders[SHADER_CORE_PROGRAM]);
-
-	//Use a program
-	shaders[SHADER_CORE_PROGRAM]->use();
-
-	//Activate texture
-	textures[TEX_CONTAINER]->bind(0);
-	textures[TEX_CONTAINER_SPEC]->bind(1);
-
-	//Render mesh
-	meshes[MESH_QUAD]->render(shaders[SHADER_CORE_PROGRAM]);
+	for (auto i : models)
+	{
+		i->render(shaders[SHADER_CORE_PROGRAM]);
+	}
 
 	glfwSwapBuffers(window);
 	glFlush();
@@ -201,9 +197,27 @@ void Game::initMaterials()
 	materials.push_back(new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f), 0, 1));	
 }
 
-void Game::initMeshes()
+void Game::initModels()
 {
-	meshes.push_back(new Mesh(&Pyramid()));	
+	std::vector<Mesh*> meshes;
+	meshes.push_back(new Mesh(&Cube()));
+	
+
+	models.push_back(new Model(glm::vec3(0.f), materials[MAT_1], textures[TEX_CONTAINER], textures[TEX_CONTAINER_SPEC], meshes));
+
+	for (auto*& i : meshes)
+		delete i;
+
+	meshes.clear();
+
+	meshes.push_back(new Mesh(&Pyramid(), glm::vec3(1.f, 0.f, 0.f)));
+
+	models.push_back(new Model(glm::vec3(0.f, 1.f, 1.f), materials[MAT_1], textures[TEX_CONTAINER], textures[TEX_CONTAINER_SPEC], meshes));
+
+	for (auto*& i : meshes)
+		delete i;
+
+	meshes.clear();
 }
 
 void Game::initLights()
