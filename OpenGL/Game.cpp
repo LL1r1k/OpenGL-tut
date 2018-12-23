@@ -6,6 +6,18 @@ Game::Game(const char * name, const int width, const int height, bool resize, in
 	fbWidht = width;
 	fbHeight = height;
 
+	dt = 0.f;
+	curTime = 0.f;
+	lastTime = 0.f;
+
+	lastMouseX = 0.0;
+	lastMouseY = 0.0;
+	mouseX = 0.0;
+	mouseY = 0.0;
+	mouseOffsetX = 0.0;
+	mouseOffsetY = 0.0;
+	firstMouse = true;
+
 	camPosition = glm::vec3(0.f, 0.f, 1.0f);
 	worldUp = glm::vec3(0.f, 1.f, 0.f);
 	camFront = glm::vec3(0.f, 0.f, -1.f);
@@ -58,7 +70,7 @@ Game::~Game()
 void Game::update()
 {
 	glfwPollEvents();
-	updateInput(window, *meshes[MESH_QUAD]);
+	updateInput();
 }
 
 void Game::render()
@@ -157,6 +169,8 @@ void Game::initOpenGLOption()
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL /*GL_LINE*/); //how to draw polygon fill or just line
+
+	glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void Game::initMatrices()
@@ -204,50 +218,63 @@ void Game::initUniforms()
 	shaders[SHADER_CORE_PROGRAM]->setVec3f(camPosition, "cameraPos");
 }
 
-void Game::updateInput(GLFWwindow* window, Mesh &mesh)
+void Game::updateKeyboardInput()
 {
-	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-	{
-		mesh.Move(glm::vec3(0.f, 0.f, -0.01f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-	{
-		mesh.Move(glm::vec3(0.f, 0.f, 0.01f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-	{
-		mesh.Move(glm::vec3(-0.01f, 0.f, 0.f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-	{
-		mesh.Move(glm::vec3(0.01f, 0.f, 0.f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS)
-	{
-		mesh.Rotate(glm::vec3(0.f, -2.f, 0.f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS)
-	{
-		mesh.Rotate(glm::vec3(0.f, 2.f, 0.f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS)
-	{
-		mesh.Scale(glm::vec3(-0.01f));
-	}
-	if (glfwGetKey(window, GLFW_KEY_X) == GLFW_PRESS)
-	{
-		mesh.Scale(glm::vec3(0.01f));
-	}
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+		CloseWindow();
+	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
+		camPosition.z -= 0.02f;
+	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
+		camPosition.z += 0.02f;
+	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
+		camPosition.x -= 0.02f;
+	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
+		camPosition.x += 0.02f;
+	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
+		camPosition.y -= 0.02f;
+	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
+		camPosition.y += 0.02f;
+}
+
+void Game::updateMouseInput()
+{
+	glfwGetCursorPos(window, &mouseX, &mouseY);
+
+	if (firstMouse)
 	{
-		glfwSetWindowShouldClose(window, GL_TRUE);
+		lastMouseX = mouseX;
+		lastMouseY = mouseY;
+		firstMouse = false;
 	}
+
+	mouseOffsetX = mouseX - lastMouseX;
+	mouseOffsetY = mouseY - lastMouseY;
+
+	lastMouseX = mouseX;
+	lastMouseY = mouseY;
+}
+
+void Game::updateInput()
+{
+	updateDt();
+	updateKeyboardInput();
+	updateMouseInput();
 }
 
 void Game::updateUniforms()
 {
 	glfwGetFramebufferSize(window, &fbWidht, &fbHeight);
-	ProjectionMatrix = glm::mat4(1.f);
+
+	ViewMatrix = glm::lookAt(camPosition, camPosition + camFront, worldUp);
+	shaders[SHADER_CORE_PROGRAM]->setMat4fv(ViewMatrix, "ViewMatrix");
+
 	ProjectionMatrix = glm::perspective(glm::radians(fov), static_cast<float>(fbWidht) / fbHeight, nearPlane, farPlane);
 	shaders[SHADER_CORE_PROGRAM]->setMat4fv(ProjectionMatrix, "ProjectionMatrix");
+}
+
+void Game::updateDt()
+{
+	curTime = static_cast<float>(glfwGetTime());
+	dt = curTime - lastTime;
+	lastTime = curTime;
 }

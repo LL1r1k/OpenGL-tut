@@ -46,8 +46,11 @@ private:
 	void initLights();
 	void initUniforms();
 
-	void updateInput(GLFWwindow* window, Mesh &mesh);
+	void updateKeyboardInput();
+	void updateMouseInput();
+	void updateInput();
 	void updateUniforms();
+	void updateDt();
 
 	//Window
 	GLFWwindow* window;
@@ -55,6 +58,13 @@ private:
 	const int winWidth, winHeight;
 	const bool resizable;
 	int fbWidht, fbHeight;
+
+	//Delta time
+	float dt, curTime, lastTime;
+
+	//Mouse input
+	double lastMouseX, lastMouseY, mouseX, mouseY, mouseOffsetX, mouseOffsetY;
+	bool firstMouse;
 
 	//OpenGL
 	const int GLVerMaj, GLVerMin;
