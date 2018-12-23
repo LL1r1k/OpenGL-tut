@@ -188,7 +188,7 @@ void Game::initMaterials()
 
 void Game::initMeshes()
 {
-	meshes.push_back(new Mesh(&Quad()));	
+	meshes.push_back(new Mesh(&Pyramid()));	
 }
 
 void Game::initLights()

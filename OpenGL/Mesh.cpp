@@ -28,7 +28,8 @@ Mesh::~Mesh()
 {
 	glDeleteVertexArrays(1, &VAO);
 	glDeleteBuffers(1, &VBO);
-	glDeleteBuffers(1, &EBO);
+	if(nrOfIndices > 0)
+		glDeleteBuffers(1, &EBO);
 }
 
 void Mesh::update()
@@ -45,7 +46,10 @@ void Mesh::render(Shader * shader)
 
 	glBindVertexArray(VAO);
 
-	glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
+	if (nrOfIndices > 0)
+		glDrawElements(GL_TRIANGLES, nrOfIndices, GL_UNSIGNED_INT, 0);
+	else
+		glDrawArrays(GL_TRIANGLES, 0, nrOfVertices);
 }
 
 void Mesh::updateModelMatrix()
@@ -100,9 +104,12 @@ void Mesh::initVAO(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* in
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, nrOfVertices * sizeof(Vertex), vertexArray, GL_STATIC_DRAW);
 
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, nrOfIndices * sizeof(GLuint), indexArray, GL_STATIC_DRAW);
+	if (nrOfIndices > 0)
+	{
+		glGenBuffers(1, &EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, nrOfIndices * sizeof(GLuint), indexArray, GL_STATIC_DRAW);
+	}	
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
 	glEnableVertexAttribArray(0);
@@ -131,9 +138,12 @@ void Mesh::initVAO(Primitives * primitive)
 	glBindBuffer(GL_ARRAY_BUFFER, VBO);
 	glBufferData(GL_ARRAY_BUFFER, primitive->getNrOfVertices() * sizeof(Vertex), primitive->getVertices(), GL_STATIC_DRAW);
 
-	glGenBuffers(1, &EBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, primitive->getNrOfIndices() * sizeof(GLuint), primitive->getIndices(), GL_STATIC_DRAW);
+	if (nrOfIndices > 0)
+	{
+		glGenBuffers(1, &EBO);
+		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, EBO);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, primitive->getNrOfIndices() * sizeof(GLuint), primitive->getIndices(), GL_STATIC_DRAW);
+	}	
 
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, position));
 	glEnableVertexAttribArray(0);
