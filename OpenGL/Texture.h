@@ -11,18 +11,16 @@
 class Texture
 {
 public:
-	Texture(const char* fileName, GLenum type, GLint texture_unit = 0);
+	Texture(const char* fileName, GLenum type);
 	~Texture();
 	inline GLuint GetID() const;
-	void bind();
+	void bind(const GLint textureUnit);
 	void unbind();
-	GLint getTextureUint() const;
 	void loadFromFile(const char* fileName);
 
 private:
 	GLuint id;
 	int height, width;
 	unsigned int type;
-	GLint textureUnit;
 };
 

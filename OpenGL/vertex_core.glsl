@@ -14,6 +14,7 @@ uniform mat4 ModelMatrix;
 uniform mat4 ViewMatrix;
 uniform mat4 ProjectionMatrix;
 
+
 void main()
 {
 	vs_position = vec4(ModelMatrix * vec4(vertex_position, 1.f)).xyz;

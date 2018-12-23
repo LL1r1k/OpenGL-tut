@@ -1,9 +1,8 @@
 #include "Texture.h"
 
-Texture::Texture(const char* fileName, GLenum type, GLint texture_unit)
+Texture::Texture(const char* fileName, GLenum type)
 {	
 	this->type = type;
-	textureUnit = texture_unit;
 	loadFromFile(fileName);
 }
 
@@ -17,7 +16,7 @@ GLuint Texture::GetID() const
 	return id;
 }
 
-void Texture::bind()
+void Texture::bind(const GLint textureUnit)
 {
 	glActiveTexture(GL_TEXTURE0 + textureUnit);
 	glBindTexture(type, id);
@@ -27,11 +26,6 @@ void Texture::unbind()
 {
 	glActiveTexture(0);
 	glBindTexture(type, 0);
-}
-
-GLint Texture::getTextureUint() const
-{
-	return textureUnit;
 }
 
 void Texture::loadFromFile(const char * fileName)

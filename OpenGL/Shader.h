@@ -17,7 +17,7 @@
 class Shader
 {
 public:
-	Shader(char* vertexFile, char* fragmentFile, char* geometryFile = NULL);
+	Shader(char* vertexFile, char* fragmentFile, char* geometryFile = NULL, const int GLMajVer = 4, const int GLMinVer = 5);
 	~Shader();
 	void use();
 	void unuse();
@@ -29,6 +29,7 @@ public:
 	void setMat4fv(glm::mat4 value, const GLchar* name, GLboolean transpose = GL_FALSE);
 private:
 	GLuint id;
+	const int GLMajorVersion, GLMinorVersion;
 
 	std::string loadShaderSource(char* fileName);
 	GLuint loadShader(GLenum type, char* fileName);

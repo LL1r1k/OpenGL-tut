@@ -5,9 +5,9 @@ Material::Material(vec3 ambient, vec3 diffuse, vec3 specular, GLint diffuseTex, 
 	this->ambient = ambient;
 	this->diffuse = diffuse;
 	this->specular = specular;
-	if(diffuseTex)
+	if(diffuseTex != -1)
 		this->diffuseTex = diffuseTex;
-	if (specularTex)
+	if (specularTex != -1)
 		this->specularTex = specularTex;
 }
 
@@ -21,8 +21,8 @@ void Material::sendToShader(Shader& programID)
 	programID.setVec3f(ambient, "material.ambient");
 	programID.setVec3f(diffuse, "material.diffuse");
 	programID.setVec3f(specular, "material.specular");
-	if (diffuseTex)
+	if (diffuseTex != -1)
 		programID.set1i(diffuseTex, "material.diffuseTex");
-	if (specularTex)
+	if (specularTex != -1)
 	programID.set1i(specularTex, "material.specularTex");
 }

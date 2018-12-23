@@ -19,7 +19,7 @@ using namespace glm;
 class Material
 {
 public:
-	Material(vec3 ambient, vec3 diffuse,vec3 specular, GLint diffuseTex = NULL, GLint specularTex = NULL);
+	Material(vec3 ambient, vec3 diffuse,vec3 specular, GLint diffuseTex = -1, GLint specularTex = -1);
 	~Material();
 	void sendToShader(Shader& programID);
 
@@ -27,8 +27,8 @@ private:
 	vec3 ambient;
 	vec3 diffuse;
 	vec3 specular;
-	GLint diffuseTex;
-	GLint specularTex;
+	GLint diffuseTex = -1;
+	GLint specularTex = -1;
 
 };
 

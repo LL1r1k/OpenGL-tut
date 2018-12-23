@@ -1,6 +1,7 @@
 #include "Shader.h"
 
-Shader::Shader(char* vertexFile, char* fragmentFile, char* geometryFile)
+Shader::Shader(char* vertexFile, char* fragmentFile, char* geometryFile, const int GLMajVer, const int GLMinVer)
+	:GLMajorVersion(GLMajVer), GLMinorVersion(GLMinVer)
 {
 	GLuint vertexShader = 0, fragmentShader = 0, geometryShader = 0;
 	vertexShader = loadShader(GL_VERTEX_SHADER, vertexFile);
@@ -86,6 +87,12 @@ std::string Shader::loadShaderSource(char * fileName)
 		std::cout << "ERROR::SHADER::COULD_NOT_OPEN_FILE: " << fileName << std::endl;
 
 	in_file.close();
+
+	std::string verN = std::to_string(GLMajorVersion) +
+		std::to_string(GLMinorVersion) + "0";	
+
+	//src.replace(src.find("#version"), 12, ("#version " + verN));
+		
 	return src;
 }
 
