@@ -6,7 +6,10 @@ enum shader_enums {
 	SHADER_CORE_PROGRAM = 0
 };
 enum texture_enum {
-	TEX_MARIO = 0
+	TEX_MARIO = 0,
+	TEX_MARIO_SPEC = 1,
+	TEX_CONTAINER = 2,
+	TEX_CONTAINER_SPEC = 3
 };
 enum material_enum {
 	MAT_1 = 0

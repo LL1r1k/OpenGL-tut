@@ -68,11 +68,14 @@ void Game::render()
 
 	updateUniforms();
 
+	materials[MAT_1]->sendToShader(*shaders[SHADER_CORE_PROGRAM]);
+
 	//Use a program
 	shaders[SHADER_CORE_PROGRAM]->use();
 
 	//Activate texture
-	textures[TEX_MARIO]->bind(0);
+	textures[TEX_CONTAINER]->bind(0);
+	textures[TEX_CONTAINER_SPEC]->bind(1);
 
 	//Render mesh
 	meshes[MESH_QUAD]->render(shaders[SHADER_CORE_PROGRAM]);
@@ -173,11 +176,14 @@ void Game::initShaders()
 void Game::initTextures()
 {
 	textures.push_back(new Texture("Images/mario.png", GL_TEXTURE_2D));
+	textures.push_back(new Texture("Images/mario_spec.png", GL_TEXTURE_2D));
+	textures.push_back(new Texture("Images/container.png", GL_TEXTURE_2D));
+	textures.push_back(new Texture("Images/container_specular.png", GL_TEXTURE_2D));
 }
 
 void Game::initMaterials()
 {
-	materials.push_back(new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f), 0));	
+	materials.push_back(new Material(glm::vec3(0.1f), glm::vec3(1.f), glm::vec3(1.f), 0, 1));	
 }
 
 void Game::initMeshes()
@@ -240,8 +246,6 @@ void Game::updateInput(GLFWwindow* window, Mesh &mesh)
 
 void Game::updateUniforms()
 {
-	materials[MAT_1]->sendToShader(*shaders[SHADER_CORE_PROGRAM]);
-
 	glfwGetFramebufferSize(window, &fbWidht, &fbHeight);
 	ProjectionMatrix = glm::mat4(1.f);
 	ProjectionMatrix = glm::perspective(glm::radians(fov), static_cast<float>(fbWidht) / fbHeight, nearPlane, farPlane);
