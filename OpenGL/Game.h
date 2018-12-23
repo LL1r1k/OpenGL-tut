@@ -88,6 +88,9 @@ private:
 
 	//Lights
 	std::vector<glm::vec3*> lights;
+
+	//Camera
+	Camera camera;
 	
 };
 

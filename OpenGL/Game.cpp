@@ -1,7 +1,8 @@
 #include "Game.h"
 
 Game::Game(const char * name, const int width, const int height, bool resize, int GLmajorVer, int GLminorVer)
-	:winWidth(width), winHeight(height), GLVerMaj(GLmajorVer), GLVerMin(GLminorVer), title(name), resizable(resize)
+	:winWidth(width), winHeight(height), GLVerMaj(GLmajorVer), GLVerMin(GLminorVer), title(name), resizable(resize),
+	camera(glm::vec3(0.f, 0.f, 1.0f), glm::vec3(0.f, 1.f, 0.f))
 {
 	fbWidht = width;
 	fbHeight = height;
@@ -20,7 +21,7 @@ Game::Game(const char * name, const int width, const int height, bool resize, in
 
 	camPosition = glm::vec3(0.f, 0.f, 1.0f);
 	worldUp = glm::vec3(0.f, 1.f, 0.f);
-	camFront = glm::vec3(0.f, 0.f, -1.f);
+	camFront = glm::vec3(0.f, 0.f, -1.f);	
 
 	fov = 90.f;
 	nearPlane = 0.1f;
@@ -215,7 +216,6 @@ void Game::initUniforms()
 	shaders[SHADER_CORE_PROGRAM]->setMat4fv(ViewMatrix, "ViewMatrix");
 	shaders[SHADER_CORE_PROGRAM]->setMat4fv(ProjectionMatrix, "ProjectionMatrix");
 	shaders[SHADER_CORE_PROGRAM]->setVec3f(*lights[0], "lightPos0");
-	shaders[SHADER_CORE_PROGRAM]->setVec3f(camPosition, "cameraPos");
 }
 
 void Game::updateKeyboardInput()
@@ -223,13 +223,13 @@ void Game::updateKeyboardInput()
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		CloseWindow();
 	if (glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)
-		camPosition.z -= 0.02f;
+		camera.move(dt, FORWARD);
 	if (glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)
-		camPosition.z += 0.02f;
+		camera.move(dt, BACK);
 	if (glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)
-		camPosition.x -= 0.02f;
+		camera.move(dt, LEFT);
 	if (glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)
-		camPosition.x += 0.02f;
+		camera.move(dt, RIGHT);
 	if (glfwGetKey(window, GLFW_KEY_C) == GLFW_PRESS)
 		camPosition.y -= 0.02f;
 	if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
@@ -248,7 +248,7 @@ void Game::updateMouseInput()
 	}
 
 	mouseOffsetX = mouseX - lastMouseX;
-	mouseOffsetY = mouseY - lastMouseY;
+	mouseOffsetY = lastMouseY - mouseY;
 
 	lastMouseX = mouseX;
 	lastMouseY = mouseY;
@@ -259,14 +259,18 @@ void Game::updateInput()
 	updateDt();
 	updateKeyboardInput();
 	updateMouseInput();
+
+	camera.updateInput(dt, -1, mouseOffsetX, mouseOffsetY);
 }
 
 void Game::updateUniforms()
 {
 	glfwGetFramebufferSize(window, &fbWidht, &fbHeight);
 
-	ViewMatrix = glm::lookAt(camPosition, camPosition + camFront, worldUp);
+	ViewMatrix = camera.getViewMatrix();
 	shaders[SHADER_CORE_PROGRAM]->setMat4fv(ViewMatrix, "ViewMatrix");
+
+	shaders[SHADER_CORE_PROGRAM]->setVec3f(camera.getPosition(), "cameraPos");
 
 	ProjectionMatrix = glm::perspective(glm::radians(fov), static_cast<float>(fbWidht) / fbHeight, nearPlane, farPlane);
 	shaders[SHADER_CORE_PROGRAM]->setMat4fv(ProjectionMatrix, "ProjectionMatrix");
