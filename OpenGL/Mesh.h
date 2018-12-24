@@ -18,14 +18,12 @@ public:
 	Mesh(Primitives* primitive,
 		glm::vec3& position = glm::vec3(0.f), glm::vec3& rotation = glm::vec3(0.f), glm::vec3& scale = glm::vec3(1.f));
 	~Mesh();
-	Mesh(const Mesh& mesh);
 	void update();
 	void render(Shader * shader);
 	void updateModelMatrix();
 
 	void setPosition(const glm::vec3& position);
 	void setRotation(const glm::vec3& rotation);
-	void setOrigin(const glm::vec3& origin);
 	void setScale(const glm::vec3& scale);
 
 	void Move(const glm::vec3& position);
@@ -33,13 +31,10 @@ public:
 	void Scale(const glm::vec3& scale);
 
 private:
-	Vertex* vertexArray;
-	GLuint* indexArray;
 	unsigned nrOfVertices, nrOfIndices;
 
 	glm::mat4 ModelMatrix;
 	glm::vec3 position;
-	glm::vec3 origin;
 	glm::vec3 rotation;
 	glm::vec3 scale;
 
@@ -47,7 +42,8 @@ private:
 	GLuint VBO;
 	GLuint EBO;
 
-	void initVAO();
+	void initVAO(Vertex* vertexArray, const unsigned& nrOfVertices, GLuint* indexArray, const unsigned& nrOfIndices);
+	void initVAO(Primitives* primitive);
 	void updateUniforms(Shader* shader);
 
 };

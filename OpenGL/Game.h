@@ -42,7 +42,7 @@ private:
 	void initShaders();
 	void initTextures();
 	void initMaterials();
-	void initModels();
+	void initMeshes();
 	void initLights();
 	void initUniforms();
 
@@ -83,8 +83,8 @@ private:
 	//Material
 	std::vector<Material*> materials;
 
-	//Models
-	std::vector<Model*> models;
+	//Meshes
+	std::vector<Mesh*> meshes;
 
 	//Lights
 	std::vector<glm::vec3*> lights;

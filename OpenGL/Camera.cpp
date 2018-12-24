@@ -12,7 +12,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 worldUp)
 	this->up = worldUp;
 
 	pitch = 0.f;
-	yaw = -90.f;
+	yaw = 0.f;
 	roll = 0.f;
 
 	updateCameraVectors();
